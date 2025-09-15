@@ -1,0 +1,32 @@
+name: PHP Lint
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  lint:
+    name: Lint PHP files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'  # ou la version que tu utilises
+
+      - name: Find all PHP files
+        id: find_php
+        run: |
+          echo "PHP_FILES=$(find . -type f -name '*.php')" >> $GITHUB_ENV
+
+      - name: Lint PHP files
+        run: |
+          for file in $PHP_FILES; do
+            echo "Linting $file"
+            php -l "$file"
+          done
