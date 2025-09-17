@@ -34,24 +34,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: docker
     steps:
-      - name: Install SSH client
-        run: sudo apt-get install -y openssh-client
-
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Debug SSH key
-        run: |
-          head -5 ~/.ssh/id_ed25519 || true
-
-
-      - name: Deploy containers
-        run: |
-          ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/junia-2025:latest
             docker stop nginx-junia || true
             docker rm nginx-junia || true
@@ -69,4 +58,3 @@ jobs:
               -p 80:80 \
               --link mysql-junia:mysql \
               ${{ secrets.DOCKERHUB_USERNAME }}/junia-2025:latest
-          EOF
