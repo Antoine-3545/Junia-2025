@@ -44,7 +44,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/junia-2025:latest .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/Junia-2025:latest .
 
   push:
     runs-on: ubuntu-latest
